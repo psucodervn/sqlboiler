@@ -1,29 +1,27 @@
 ![sqlboiler logo](https://i.imgur.com/lMXUTPE.png)
 
 [![License](https://img.shields.io/badge/license-BSD-blue.svg)](https://github.com/volatiletech/sqlboiler/blob/master/LICENSE)
-[![GoDoc](https://godoc.org/github.com/volatiletech/sqlboiler?status.svg)](https://godoc.org/github.com/volatiletech/sqlboiler)
-[![Mail](https://img.shields.io/badge/mail%20list-sqlboiler-lightgrey.svg)](https://groups.google.com/a/volatile.tech/forum/#!forum/sqlboiler)
-[![Mail-Annc](https://img.shields.io/badge/mail%20list-sqlboiler--announce-lightgrey.svg)](https://groups.google.com/a/volatile.tech/forum/#!forum/sqlboiler-announce)
+[![GoDoc](https://img.shields.io/badge/godoc-reference-5272B4)](https://pkg.go.dev/mod/github.com/volatiletech/sqlboiler/v4)
 [![Slack](https://img.shields.io/badge/slack-%23general-lightgrey.svg)](https://sqlboiler.from-the.cloud)
-[![CircleCI](https://circleci.com/gh/volatiletech/sqlboiler.svg?style=shield)](https://circleci.com/gh/volatiletech/sqlboiler)
+![ActionsCI](https://github.com/volatiletech/sqlboiler/workflows/test/badge.svg)
 [![Go Report Card](https://goreportcard.com/badge/volatiletech/sqlboiler)](http://goreportcard.com/report/volatiletech/sqlboiler)
 
 SQLBoiler is a tool to generate a Go ORM tailored to your database schema.
 
 It is a "database-first" ORM as opposed to "code-first" (like gorm/gorp).
 That means you must first create your database schema. Please use something
-like [goose](https://bitbucket.org/liamstask/goose), [sql-migrate](https://github.com/rubenv/sql-migrate)
+like [sql-migrate](https://github.com/rubenv/sql-migrate)
 or some other migration tool to manage this part of the database's life-cycle.
 
-# Note on v2 vs v3
+# Note on versions
 
-v3 has been released, please upgrade when possible, v2 is on life support only now.
+v1, v2, and v3 are no longer maintained.
 
-# Note on v3 vs v4
+v3 is the last GOPATH-compatible version.
 
-v4 is identical virtually identical to v3 (it has 1 or 2 more features) but
-was turned into modules. The installation instructions are the biggest
-difference but it's largely left up to the user to decide how to install it.
+v4 has no real breaking changes between v3 and itself other than Go modules
+and is the only maintained version. Note this does not work with GOPATH
+projects.
 
 ## Why another ORM
 
@@ -52,6 +50,7 @@ Table of Contents
     * [Why another ORM](#why-another-orm)
     * [About SQL Boiler](#about-sql-boiler)
       * [Features](#features)
+      * [Missing Features](#missing-features)
       * [Supported Databases](#supported-databases)
       * [A Small Taste](#a-small-taste)
     * [Requirements &amp; Pro Tips](#requirements--pro-tips)
@@ -102,6 +101,7 @@ Table of Contents
         * [How do I use the types.BytesArray for Postgres bytea arrays?](#how-do-i-use-typesbytesarray-for-postgres-bytea-arrays)
         * [Why aren't my time.Time or null.Time fields working in MySQL?](#why-arent-my-timetime-or-nulltime-fields-working-in-mysql)
         * [Where is the homepage?](#where-is-the-homepage)
+        * [Why are the auto-generated tests failing?](#why-are-the-auto-generated-tests-failing)
   * [Benchmarks](#benchmarks)
 
 ## About SQL Boiler
@@ -131,13 +131,18 @@ Table of Contents
 - Enum types
 - Out of band driver support
 
+### Missing features
+
+- Multi-column foreign key support
+- View/Materialized view support
+
 ### Supported Databases
 
 | Database          | Driver Location |
 | ----------------- | --------------- |
-| PostgreSQL        | [https://github.com/volatiletech/sqlboiler/drivers/sqlboiler-psql](drivers/sqlboiler-psql)
-| MySQL             | [https://github.com/volatiletech/sqlboiler/drivers/sqlboiler-mysql](drivers/sqlboiler-mysql)
-| MSSQLServer 2012+ | [https://github.com/volatiletech/sqlboiler/drivers/sqlboiler-mssql](drivers/sqlboiler-mssql)
+| PostgreSQL        | [https://github.com/volatiletech/sqlboiler/v4/drivers/sqlboiler-psql](drivers/sqlboiler-psql)
+| MySQL             | [https://github.com/volatiletech/sqlboiler/v4/drivers/sqlboiler-mysql](drivers/sqlboiler-mysql)
+| MSSQLServer 2012+ | [https://github.com/volatiletech/sqlboiler/v4/drivers/sqlboiler-mssql](drivers/sqlboiler-mssql)
 | SQLite3           | https://github.com/volatiletech/sqlboiler-sqlite3
 | CockroachDB       | https://github.com/glerchundi/sqlboiler-crdb
 
@@ -152,7 +157,7 @@ For a comprehensive list of available operations and examples please see [Featur
 ```go
 import (
   // Import this so we don't have to use qm.Limit etc.
-  . "github.com/volatiletech/sqlboiler/queries/qm"
+  . "github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
 // Open handle to database like normal
@@ -216,7 +221,7 @@ fmt.Println(len(users.R.FavoriteMovies))
 
 ### Requirements
 
-* Go 1.6 minimum, and Go 1.7 for compatibility tests.
+* Go 1.13, older Go versions are not supported.
 * Table names and column names should use `snake_case` format.
   * We require `snake_case` table names and column names. This is a recommended default in Postgres,
   and we agree that it's good form, so we're enforcing this format for all drivers for the time being.
@@ -255,6 +260,9 @@ fmt.Println(len(users.R.FavoriteMovies))
 If you like learning via a video medium, sqlboiler has a number of screencasts
 available.
 
+*NOTE:* These videos predate modules (v4), the installation/import paths will be
+different though everything else should remain similar.
+
 [SQLBoiler: Getting Started](https://www.youtube.com/watch?v=y5utRS9axfg)
 
 [SQLBoiler: What's New in v3](https://www.youtube.com/watch?v=-B-OPsYRZJA)
@@ -265,15 +273,29 @@ available.
 
 #### Download
 
-```shell
-# Note: You must run this outside of your Go module directory. This must be done
-# in GOPATH mode to get the correct result. If you'd like to pin the version
-# manually via Go modules you can attempt other installation instructions.
-go get -u -t github.com/volatiletech/sqlboiler
+To install the latest versions run the commands below. Thes GO111MODULE
+environment variable is to ensure that you don't accidentally add this to
+your current directory's module. See go issue:
+https://github.com/golang/go/issues/30515
 
-# Also install the driver of your choice, there exists psql, mysql, mssql
-# These are separate binaries.
-go get github.com/volatiletech/sqlboiler/drivers/sqlboiler-psql
+```shell
+# Install sqlboiler v4
+GO111MODULE=off go get -u -t github.com/volatiletech/sqlboiler
+# Install an sqlboiler driver - these are seperate binaries, here we are
+# choosing postgresql
+GO111MODULE=off go get github.com/volatiletech/sqlboiler/drivers/sqlboiler-psql
+```
+
+To install `sqlboiler` as a dependency in your project use the commands below
+inside of your go module's directory tree. This will install the dependencies
+into your `go.mod` file at the correct version.
+
+```shell
+# Do not forget the trailing /v4
+go get github.com/volatiletech/sqlboiler/v4
+# Assuming you're going to use the null package for its additional null types
+# Do not forget the trailing /v8
+go get github.com/volatiletech/null/v8
 ```
 
 #### Configuration
@@ -362,7 +384,7 @@ not to pass them through the command line or environment variables:
 ```toml
 output   = "my_models"
 wipe     = true
-no_tests = true
+no-tests = true
 
 [psql]
   dbname = "dbname"
@@ -422,7 +444,7 @@ Flags:
       --no-tests                   Disable generated go test files
   -o, --output string              The name of the folder to output to (default "models")
   -p, --pkgname string             The name you wish to assign to your generated package (default "models")
-      --struct-tag-casing string   Decides the casing for go structure tag names. camel, title or snake (default snake) (default "snake")
+      --struct-tag-casing string   Decides the casing for go structure tag names. camel, title, alias or snake (default "snake")
   -t, --tag strings                Struct tags to be included on your models in addition to json, yaml, toml
       --tag-ignore strings         List of column names that should have tags values set to '-' (ignored during parsing)
       --templates strings          A templates directory, overrides the bindata'd template folders in sqlboiler
@@ -617,10 +639,17 @@ The way to accomplish this is through the config file.
 [[types]]
   # The match is a drivers.Column struct, and matches on almost all fields.
   # Notable exception for the unique bool. Matches are done
-  # with "logical and" meaning it must match all specified matchers. Boolean values
-  # are only checked if all the string specifiers match first, and they
-  # must always match.
+  # with "logical and" meaning it must match all specified matchers.
+  # Boolean values are only checked if all the string specifiers match first,
+  # and they must always match.
+  #
   # Not shown here: db_type is the database type and a very useful matcher
+  # We can also whitelist tables for this replace by adding to the types.match:
+  # tables = ['users', 'videos']
+  #
+  # Note there is precedence for types.match, more specific things should appear
+  # further down in the config as once a matching rule is found it is executed
+  # immediately.
   [types.match]
     type = "null.String"
     nullable = true
@@ -1011,6 +1040,12 @@ for soft-deletion.
 *NOTE*: As of writing soft-delete is opt-in via `--add-soft-deletes` and is
 liable to change in future versions.
 
+*NOTE*: The `Delete` helpers will _not_ set `updated_at` currently. The current
+philosophy is that deleting the object is simply metadata and since it returns
+in no queries (other than raw ones) the updated_at will no longer be relevant.
+This could change in future versions if people disagree with this but it is
+the current behavior.
+
 ### Query Building
 
 We generate "Starter" methods for you. These methods are named as the plural versions of your model,
@@ -1068,7 +1103,7 @@ safe, but be careful!
 
 ```go
 // Dot import so we can access query mods directly instead of prefixing with "qm."
-import . "github.com/volatiletech/sqlboiler/queries/qm"
+import . "github.com/volatiletech/sqlboiler/v4/queries/qm"
 
 // Use a raw query against a generated struct (Pilot in this example)
 // If this query mod exists in your call, it will override the others.
@@ -1208,7 +1243,7 @@ in combination with your own custom, non-generated model.
 
 ### Binding
 
-For a comprehensive ruleset for `Bind()` you can refer to our [godoc](https://godoc.org/github.com/volatiletech/sqlboiler/queries#Bind).
+For a comprehensive ruleset for `Bind()` you can refer to our [pkg.go.dev](https://pkg.go.dev/github.com/volatiletech/sqlboiler/v4/queries#Bind).
 
 The `Bind()` [Finisher](#finisher) allows the results of a query built with
 the [Raw SQL](#raw-query) method or the [Query Builder](#query-building) methods to be bound
@@ -1486,7 +1521,7 @@ tx.Rollback()
 
 It's also worth noting that there's a way to take advantage of `boil.SetDB()`
 by using the
-[boil.BeginTx()](https://godoc.org/github.com/volatiletech/sqlboiler/boil#BeginTx)
+[boil.BeginTx()](https://pkg.go.dev/github.com/volatiletech/sqlboiler/v4/boil#BeginTx)
 function. This opens a transaction using the globally stored database.
 
 ### Debug Logging
@@ -1561,7 +1596,7 @@ greylist in cases where you want to insert a Go zero value.
 **NOTE:** CreatedAt/UpdatedAt are not included in `Whitelist` automatically.
 
 See the documentation for
-[boil.Columns.InsertColumnSet](https://godoc.org/github.com/volatiletech/sqlboiler/boil/#Columns.InsertColumnSet)
+[boil.Columns.InsertColumnSet](https://pkg.go.dev/github.com/volatiletech/sqlboiler/v4/boil/#Columns.InsertColumnSet)
 for more details.
 
 ```go
@@ -1613,7 +1648,7 @@ documentation above for more details.
 **NOTE:** CreatedAt/UpdatedAt are not included in `Whitelist` automatically.
 
 See the documentation for
-[boil.Columns.UpdateColumnSet](https://godoc.org/github.com/volatiletech/sqlboiler/boil/#Columns.UpdateColumnSet)
+[boil.Columns.UpdateColumnSet](https://pkg.go.dev/github.com/volatiletech/sqlboiler/v4/boil/#Columns.UpdateColumnSet)
 for more details.
 
 ```go
@@ -1883,6 +1918,25 @@ You *must* use a DSN flag in MySQL connections, see: [Requirements](#requirement
 
 The homepage for the [SQLBoiler](https://github.com/volatiletech/sqlboiler) [Golang ORM](https://github.com/volatiletech/sqlboiler)
 generator is located at: https://github.com/volatiletech/sqlboiler
+
+#### Why are the auto-generated tests failing?
+
+The tests generated for your models package with sqlboiler are fairly
+error-prone. They are usually broken by constraints in the database
+that sqlboiler can't hope to understand.
+
+During regular run-time this isn't an issue because your code will throw errors
+and you will fix it however the auto-generated tests can only report those
+errors and it seems like something is wrong when in reality the only issue is
+that the auto generated tests can't understand that your `text` column is
+validated by a regex that says it must be composed solely of the 'b' character
+repeated 342 times.
+
+These tests are broken especially by foreign key constraints because of the
+parallelism we use. There's also no understanding in the tests of dependencies
+based on these foreign keys. As such there is a process that removes the foreign
+keys from your schema when they are run, if this process messes up you will get
+errors relating to foreign key constraints.
 
 ## Benchmarks
 
